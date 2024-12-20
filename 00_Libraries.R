@@ -36,7 +36,8 @@ pacman::p_load("lubridate",
                "mosaic",
                "dataRetrieval",
                "writexl",
-               "rLakeAnalyzer")
+               "rLakeAnalyzer", 
+               "ggpubr")
 
 #Use renv for version control.  Beginner guide here:
 # https://rstudio.github.io/renv/articles/renv.html
