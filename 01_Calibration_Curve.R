@@ -69,62 +69,138 @@
         
 ##02. Plot Calibration Curves ---- 
 #Plot Expected vs. Area for each gas 
-        # NEXT STEP: Make this pretty and add info 
-        # CO2 
-        library(ggpubr)  # F
-        
-        calibration_curve_co2 <- calib_co2 %>%
-          ggplot(aes(
-            x = TCD_peak,
-            y = expected_co2)) + 
-          geom_point(color= "#39B600") +
-          theme_bw() + 
-          labs(x = "TCD Peak Area",
-               y = "Expected CO2 (ppm)", 
-               title = "Calibration Curve CO2") + 
-          geom_smooth(method = "lm",  #add a linear trend
-                      se = TRUE, 
-                      color = "#39B600") + #Include error bars around the trend
-          stat_cor(#These next few lines add the model summaries to your graph
-            aes(label = paste(..rr.label..,
-                              ..p.label..,
-                              sep = "~`,`~")),
-            label.y = 800, #You may need to adjust this label position
-            digits = 2,#How many significant digits
-            size=5) +  #specify font size
-          stat_regline_equation(label.y = 750,#Add the equation to the graph
-                                size=5 #specify font size
-                                ) 
-        calibration_curve_co2
+      
+  # Write Plotting Fucntions  
+    # CO2  
+        Calib_Curve_CO2_FUNC <- function(calib_co2){
+          calib_co2 %>%
+            ggplot(aes(
+              x = TCD_peak,
+              y = expected_co2)) + 
+            geom_point(color= "#39B600") +
+            theme_bw() + 
+            labs(x = "TCD Peak Area",
+                 y = "Expected CO2 (ppm)", 
+                 title = "Calibration Curve CO2") + 
+            geom_smooth(method = "lm",  #add a linear trend
+                        se = TRUE, 
+                        color = "#39B600") + #Include error bars around the trend
+            stat_cor(#These next few lines add the model summaries to your graph
+              aes(label = paste(..rr.label..,
+                                ..p.label..,
+                                sep = "~`,`~")),
+              label.y = 800, #You may need to adjust this label position
+              digits = 2,#How many significant digits
+              size=5) +  #specify font size
+            stat_regline_equation(label.y = 750,#Add the equation to the graph
+                                  size=5) #specify font size
+        }
+       
         
     # CH4
-        calibration_curve_co2 <- calib_co2 %>%
-          ggplot(aes(
-            x = TCD_peak,
-            y = expected_co2)) + 
-          geom_point(color= "#39B600") +
-          theme_bw() + 
-          labs(x = "TCD Peak Area",
-               y = "Expected CO2 (ppm)", 
-               title = "Calibration Curve CO2") + 
-          geom_smooth(method = "lm",  #add a linear trend
-                      se = TRUE, 
-                      color = "#39B600") + #Include error bars around the trend
-          stat_cor(#These next few lines add the model summaries to your graph
-            aes(label = paste(..rr.label..,
-                              ..p.label..,
-                              sep = "~`,`~")),
-            label.y = 800, #You may need to adjust this label position
-            digits = 2,#How many significant digits
-            size=5) +  #specify font size
-          stat_regline_equation(label.y = 750,#Add the equation to the graph
-                                size=5 #specify font size
-          ) 
+        Calib_Curve_CH4_FUNC <- function(calib_ch4){
+          calib_ch4 %>%
+            ggplot(aes(
+              x = FID_peak,
+              y = expected_ch4)) + 
+            geom_point(color= "#FF3D00") +
+            theme_bw() + 
+            labs(x = "FID Peak Area",
+                 y = "Expected CH4 (ppm)", 
+                 title = "Calibration Curve CH4") + 
+            geom_smooth(method = "lm",  #add a linear trend
+                        se = TRUE, 
+                        color = "#FF3D00") + #Include error bars around the trend
+            stat_cor(#These next few lines add the model summaries to your graph
+              aes(label = paste(..rr.label..,
+                                ..p.label..,
+                                sep = "~`,`~")),
+              label.y = 90, #You may need to adjust this label position
+              digits = 2,#How many significant digits
+              size=5) +  #specify font size
+            stat_regline_equation(label.y = 80,#Add the equation to the graph
+                                  size=5) #specify font size
+        }
+        
+    #N2O 
+        Calib_Curve_N2O_FUNC <- function(calib_n2o){
+          calib_n2o %>%
+            ggplot(aes(
+              x = ECD_peak,
+              y = expected_n2o)) + 
+            geom_point(color= "#C77CFF") +
+            theme_bw() + 
+            labs(x = "ECD Peak Area",
+                 y = "Expected N2O (ppm)", 
+                 title = "Calibration Curve N2O") + 
+            geom_smooth(method = "lm",  #add a linear trend
+                        se = TRUE, 
+                        color = "#C77CFF") + #Include error bars around the trend
+            stat_cor(#These next few lines add the model summaries to your graph
+              aes(label = paste(..rr.label..,
+                                ..p.label..,
+                                sep = "~`,`~")),
+              label.y = 5, #You may need to adjust this label position
+              digits = 2,#How many significant digits
+              size=5) +  #specify font size
+            stat_regline_equation(label.y = 4,#Add the equation to the graph
+                                  size=5) #specify font size
+        }
+
+        
+    # Check Calibration Curves 
+        calibration_curve_co2 <- Calib_Curve_CO2_FUNC(calib_co2)
         calibration_curve_co2
         
+        calibration_curve_ch4 <- Calib_Curve_CH4_FUNC(calib_ch4)
+        calibration_curve_ch4
+        
+        calibration_curve_n2o <- Calib_Curve_N2O_FUNC(calib_n2o)
+        calibration_curve_n2o
+        
+    # Remove any Points 
+        
+        # CO2
+        calibration_curve_co2
+        calib_co2_full <- calib_co2
+        calib_co2 <- calib_co2[!calib_co2$Sample_ID =="1000ppm CO2 4",]
+        
+    # Record what points (if any) were removed from calibration curve for each gas 
+        removed_co2 <- "1000ppm CO2 4"
+        removed_ch4 <- "NA"
+        removed_n2o <- "NA"
+        
+    # Add any Calibration Notes 
+        calib_notes_co2 <- "NA"
+        calib_notes_ch4 <- "NA"
+        calib_notes_n2o <- "NA"
+        
 # 02. Linear regression for each gas and save slope and intercept  
+        
+      # CO2
+        calib_co2_lm <- lm(expected_co2 ~ TCD_peak, data=calib_co2) # run linear model 
+        co2_r2 <- summary(calib_co2_lm)$r.squared %>% as.numeric() # save R2
+        co2_intercept <- coef(calib_co2_lm)[1] %>% as.numeric() #save intercept 
+        co2_slope <- coef(calib_co2_lm)[2] %>% as.numeric()  # save slope 
+        
+      # CH4
+        calib_ch4_lm <- lm(expected_ch4 ~ FID_peak, data=calib_ch4) # run linear model 
+        ch4_r2 <- summary(calib_ch4_lm)$r.squared %>% as.numeric() # save R2
+        ch4_intercept <- coef(calib_ch4_lm)[1] %>% as.numeric() #save intercept 
+        ch4_slope <- coef(calib_ch4_lm)[2] %>% as.numeric()  # save slope 
+        
+      # N2O
+        calib_n2o_lm <- lm(expected_n2o ~ ECD_peak, data=calib_n2o) # run linear model 
+        n2o_r2 <- summary(calib_n2o_lm)$r.squared %>% as.numeric() # save R2
+        n2o_intercept <- coef(calib_n2o_lm)[1] %>% as.numeric() #save intercept 
+        n2o_slope <- coef(calib_n2o_lm)[2] %>% as.numeric()  # save slope 
       
-# 03. Save calib 
+# 03. Save calib coeficients as a dataframe 
+        co2_calib_coefs <- c("CO2", co2_r2, co2_intercept, co2_slope, removed_co2, calib_notes_co2)
+        ch4_calib_coefs <- c("CH4", ch4_r2, ch4_intercept, ch4_slope, removed_ch4, calib_notes_ch4)
+        n2o_calib_coefs <- c("N2O", n2o_r2, n2o_intercept, n2o_slope, removed_n2o, calib_notes_n2o)
+        
+        calib_coefs <- rbind(co2_calib_coefs, ch4_calib_coefs ,  n2o_calib_coefs) %>% as.data.frame()
         
         
         # [Once you have the slope and intercept for each gas for a day save it as a df and then you can just pull when you need and you don't have to re-run the calibration curve every time]
