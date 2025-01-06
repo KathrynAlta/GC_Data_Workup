@@ -271,7 +271,6 @@
        drift_n2o_plot
        
   ## Add saving R2, then if p value is bellow 0.05 and R2 above 0.65 do drift correction 
-  #***************** Next step      ---- 
        
     # linear model for drift and save p-value   
        drift_ch4_lm <- lm(FID_peak ~ Sample_Location_GC, data=drift) # run linear model 
@@ -321,6 +320,7 @@
     # write_xlsx(calib_coefs, "01_Data/GC/03_Calibration_Coef/20241216_calib_coefs.xlsx")
   
 ## 05. Drift Correct if necessary ----
+   # correct if if p value is significant and R2 is greater than 0.65 (Prairie 1996) via Pascal and Nick in Holgerson Lab pipeline for GC drift corrections
    
    names(samples)[names(samples) == "FID_peak"] <- "FID_peak_raw"
    names(samples)[names(samples) == "TCD_peak"] <- "TCD_peak_raw"
@@ -329,6 +329,10 @@
    samples$drift_ch4_pval <- drift_ch4_pval
    samples$drift_co2_pval <- drift_co2_pval
    samples$drift_n2o_pval <- drift_n2o_pval
+   
+   samples$drift_ch4_r2 <- drift_ch4_r2
+   samples$drift_co2_r2 <- drift_co2_r2
+   samples$drift_n2o_r2 <- drift_n2o_r2
    
    samples$FID_peak_corrected <- ifelse(samples$drift_ch4_pval >= 0.05, 
                                         samples$FID_peak_raw,
@@ -347,12 +351,19 @@
    samples$CH4_ppm <- as.numeric(samples$FID_peak_corrected * ch4_slope + ch4_intercept)
    samples$CO2_ppm <- as.numeric(samples$TCD_peak_corrected * co2_slope + co2_intercept)
    samples$N2O_ppm <- as.numeric(samples$ECD_peak_corrected * n2o_slope + n2o_intercept)
-
+   
 ## 07. Format and save clean dataframe ---- 
-   ## Next step here
-        
-        
-        
+ 
+   #Subset to only the columns that you want 
+   names(samples)
+   samples$Calib_Calc_Date <- calib_calc_date
+   samples_clean <- subset(samples, select = c("Run_Date", "Calib_Calc_Date", "Sample_ID", "CH4_ppm", "CO2_ppm" , "N2O_ppm" ))
+   head(samples_clean)     
+   
+   # Save output (save by run date)
+   write_excel_csv2(samples_clean, "01_Data/GC/04_Cleaned_Data/20241216_samples_clean.xlsx")     
+   
+  # Merge with sample information   
         
         
         
