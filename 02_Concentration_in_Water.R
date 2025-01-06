@@ -75,6 +75,9 @@
   gc_data$CO2_mol_headspace <- (gc_data$CO2_atm * gc_data$Equilibration_Volume_gas_m3) / (R * gc_data$Equilibration_Temp_K)
   gc_data$N2O_mol_headspace <- (gc_data$N2O_atm * gc_data$Equilibration_Volume_gas_m3) / (R * gc_data$Equilibration_Temp_K)
   
+# Then use Henry's law to go from the number of moles in the headspace to the concentration in the water 
+  # Weiss (1974) and Wiesenburg and Guinasso (1979) check for constants (cited by Holgerson et al in TXh and MUD )
+  
   
 
 
