@@ -133,14 +133,14 @@
             ggplot(aes(
               x = ECD_peak,
               y = expected_n2o)) + 
-            geom_point(color= "#C77CFF") +
+            geom_point(color= "blue") +
             theme_bw() + 
             labs(x = "ECD Peak Area",
                  y = "Expected N2O (ppm)", 
                  title = "Calibration Curve N2O") + 
             geom_smooth(method = "lm",  #add a linear trend
                         se = TRUE, 
-                        color = "#C77CFF") + #Include error bars around the trend
+                        color = "blue") + #Include error bars around the trend
             stat_cor(#These next few lines add the model summaries to your graph
               aes(label = paste(..rr.label..,
                                 ..p.label..,
@@ -148,7 +148,7 @@
               label.y = 5, #You may need to adjust this label position
               digits = 2,#How many significant digits
               size=5) +  #specify font size
-            stat_regline_equation(label.y = 4,#Add the equation to the graph
+            stat_regline_equation(label.y = 4.7,#Add the equation to the graph
                                   size=5) #specify font size
         }
 
@@ -250,12 +250,12 @@
          ggplot(aes(
            x = Sample_Location_GC ,
            y = ECD_peak)) + 
-         geom_point(color= "#C77CFF") +
+         geom_point(color= "blue") +
          theme_bw() + 
          labs(x = "Sample Location on GC",
               y = "ECD Peak", 
               title = "Drift Check N2O") + 
-         geom_smooth(method = "lm", se = TRUE, color = "#C77CFF") + #Include error bars around the trend
+         geom_smooth(method = "lm", se = TRUE, color = "blue") + #Include error bars around the trend
          stat_cor(#These next few lines add the model summaries to your graph
            aes(label = paste(..rr.label..,
                              ..p.label..,
@@ -280,14 +280,15 @@
            drift_ch4_intercept <- coef(drift_ch4_lm)[1] %>% as.numeric  %>% round(3)  # Save intercept and slope from Drift linear model and use to correct drift iff necessary? 
            drift_ch4_slope <- coef(drift_ch4_lm)[2] %>% as.numeric%>% round(3)  
        
-       drift_co2_lm <- lm(TCD_peak ~ Sample_Location_GC, data=drift) # run linear model 
+       drift_co2_lm <- lm(TCD_peak ~ Sample_Location_GC, data=drift) # run linear model
+       drift_co2_r2 <- summary(drift_co2_lm)$r.squared %>% as.numeric() %>% round(3)
        drift_co2_pval <- summary(drift_co2_lm)$coefficients[2,4] %>% round(3)  
            drift_co2_intercept <- coef(drift_co2_lm)[1] %>% as.numeric %>% round(3)   # Save intercept and slope from Drift linear model and use to correct drift iff necessary? 
            drift_co2_slope <- coef(drift_co2_lm)[2] %>% as.numeric %>% round(3)  
        
        drift_n2o_lm <- lm(ECD_peak ~ Sample_Location_GC, data=drift) # run linear model 
+       drift_n2o_r2 <- summary(drift_n2o_lm)$r.squared %>% as.numeric() %>% round(3)
        drift_n2o_pval <- summary(drift_n2o_lm)$coefficients[2,4] %>% round(3)
-            
            drift_n2o_intercept <- coef(drift_n2o_lm)[1] %>% as.numeric %>% round(3)   # Save intercept and slope from Drift linear model and use to correct drift iff necessary? 
            drift_n2o_slope <- coef(drift_n2o_lm)[2] %>% as.numeric %>% round(3)  
            
@@ -299,25 +300,25 @@
 # 04. Save calib coeficients as a dataframe ----
    co2_calib_coefs <- c(gc_run_date, calib_calc_date, "CO2", 
                         co2_r2, co2_intercept, co2_slope, removed_co2, 
-                        drift_co2_pval, drift_co2_intercept, drift_co2_slope, 
+                        drift_co2_pval, drift_co2_r2, drift_co2_intercept, drift_co2_slope, 
                         notes_co2)
    ch4_calib_coefs <- c(gc_run_date, calib_calc_date, "CH4", 
                         ch4_r2, ch4_intercept, ch4_slope, removed_ch4, 
-                        drift_ch4_pval, drift_ch4_intercept, drift_ch4_slope, 
+                        drift_ch4_pval, drift_ch4_r2, drift_ch4_intercept, drift_ch4_slope, 
                         notes_ch4)
    n2o_calib_coefs <- c(gc_run_date, calib_calc_date, "N2O", 
                         n2o_r2, n2o_intercept, n2o_slope, removed_n2o, 
-                        drift_n2o_pval, drift_n2o_intercept, drift_n2o_slope, 
+                        drift_n2o_pval, drift_n2o_r2, drift_n2o_intercept, drift_n2o_slope, 
                         notes_n2o)
    
    calib_coefs <- rbind(co2_calib_coefs, ch4_calib_coefs ,  n2o_calib_coefs) %>% as.data.frame()
    names(calib_coefs) <- c("GC_Run_Date", "Calc_Date", "Gas",
                            "Calib_R2", "Calib_Intercept", "Calib_Slope", "Calib_Points_Removed", 
-                           "Drift_pvalue", "Drift_Intercept", "Drift_Slope","Notes")
+                           "Drift_pvalue", "Drift_R2","Drift_Intercept", "Drift_Slope","Notes")
    row.names(calib_coefs) <- seq(1:nrow(calib_coefs))
    
    # Save output 
-   # write_xlsx(calib_coefs, "01_Data/GC/03_Calibration_Coef/20241216_calib_coefs.xlsx")
+    # write_xlsx(calib_coefs, "01_Data/GC/03_Calibration_Coef/20241216_calib_coefs.xlsx")
   
 ## 05. Drift Correct if necessary ----
    
