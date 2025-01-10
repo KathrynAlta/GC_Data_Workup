@@ -357,11 +357,12 @@
    #Subset to only the columns that you want 
    names(samples)
    samples$Calib_Calc_Date <- calib_calc_date
-   samples_clean <- subset(samples, select = c("Run_Date", "Calib_Calc_Date", "Sample_ID", "CH4_ppm", "CO2_ppm" , "N2O_ppm" ))
-   head(samples_clean)     
+   samples_clean <- subset(samples, select = c("Run_Date", "Calib_Calc_Date", "Sample_ID", "CH4_ppm", "CO2_ppm" , "N2O_ppm" )) %>% as.data.frame()
+   head(samples_clean)  
+   str(samples_clean)
    
    # Save output (save by run date)
-   # write_excel_csv2(samples_clean, "01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")     
+   write_xlsx(samples_clean, "01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")     
    
    
   

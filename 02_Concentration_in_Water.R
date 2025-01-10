@@ -1,37 +1,34 @@
 ## CONCENTRAION OF GAS IN WATER ----
+## need to convert umol/L using ideal gas law and Henry's constant 
 
 # 00. Set Up R Environment ----
 
   # Set working directory 
-  # setwd("/Users/altagannon/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice") # Laptop KAG
-  setwd("/Users/kaga3666/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice")    # Desktop SEEC
-  
+    # setwd("/Users/altagannon/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice") # Laptop KAG
+    setwd("/Users/kaga3666/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice")    # Desktop SEEC
+    
   # Load packages and functions 
-  source("02_Analysis/GC_Data_Workup/00_libraries.R")
-  source("02_Analysis/GC_Data_Workup/00_functions.R")
+    source("02_Analysis/GC_Data_Workup/00_libraries.R")
+    source("02_Analysis/GC_Data_Workup/00_functions.R")
 
   # Load Data 
-  samples_clean <- read_excel("01_Data/GC/04_Cleaned_Data/20241216_samples_clean.xlsx")
-  exetainer_ids <- read_excel("01_Data/Field_Sheets/Exetainer_IDs/20250106_GHG_Under_Ice_Exetainers.xlsx")
-  site_data <-  read_excel("01_Data/Field_Sheets/Site_Data/20250106_GHG_Under_Ice_Site_Data.xlsx")
+    samples_clean <- read_excel("01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")
+    exetainer_ids <- read_excel("01_Data/Field_Sheets/Exetainer_IDs/20250106_GHG_Under_Ice_Exetainers.xlsx")
+    site_data <-  read_excel("01_Data/Field_Sheets/Site_Data/20250106_GHG_Under_Ice_Site_Data.xlsx")
+    
+  # Format Data 
+    # Fix columne names in exetainer Ids 
+    names(samples_clean)[names(samples_clean) == "Sample_ID"] <- "Exetainer_ID"
+    names(exetainer_ids)[names(exetainer_ids) == "Lake Name"] <- "Lake_Name"
+    names(exetainer_ids)[names(exetainer_ids) == "Water_Temp"] <- "Water_Temp_C"
+    names(exetainer_ids)[names(exetainer_ids) == "Collection Method"] <- "Collection_Method"
+    
+    # Merge clean sample data and exetainer IDs 
+    head(samples_clean)
+    head(exetainer_ids)
+    gc_data <- left_join(samples_clean, exetainer_ids)
   
-  # also need to pull in barometric pressure 
-  
-  # Fix columne names in exetainer Ids 
-  names(samples_clean)[names(samples_clean) == "Sample_ID"] <- "Exetainer_ID"
-  names(exetainer_ids)[names(exetainer_ids) == "Lake Name"] <- "Lake_Name"
-  names(exetainer_ids)[names(exetainer_ids) == "Water_Temp"] <- "Water_Temp_C"
-  names(exetainer_ids)[names(exetainer_ids) == "Collection Method"] <- "Collection_Method"
-  
-  # Merge clean sample data and exetainer IDs 
-  head(samples_clean)
-  head(exetainer_ids)
-  gc_data <- left_join(samples_clean, exetainer_ids)
-  
-  
-## need to convert umol/L using ideal gas law and Henry's constant 
-  
-# 01. Convert to ppm to moles ----
+# 01. Convert from ppm to moles of each gas----
   
   # Convert barometric pressure from inHg to atm 
   site_data$Baro_atm <- site_data$Baro_inHG * 0.0334
