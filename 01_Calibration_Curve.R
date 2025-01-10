@@ -361,11 +361,10 @@
    head(samples_clean)     
    
    # Save output (save by run date)
-   # write_excel_csv2(samples_clean, "01_Data/GC/04_Cleaned_Data/20241216_samples_clean.xlsx")     
+   # write_excel_csv2(samples_clean, "01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")     
    
    
-  # Merge with sample information  
-   exetainer_ids <- read_excel("01_Data/Field_Sheets/Exetainer_IDs/20250106_GHG_Under_Ice_Exetainers.xlsx")
+  
         
         
         
