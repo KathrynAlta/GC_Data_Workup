@@ -47,6 +47,8 @@ data$CH4_sample_uatm <- data$`Calculated CH4 final (ppm)`*data$pressure_kesterel
 data$N2O_sample_uatm <- data$`Calculated N2O final (ppm)`*data$pressure_kesterel_atm
 
 #4.5) Concentration calculations (for headspace created with atmospheric air)
+# Henry's law to get concentrations in the water 
+# 
 data$CO2_umol_L <- ((data$CO2_sample_uatm* data$Vol_water_L* data$CO2_kh)+((data$CO2_sample_uatm* data$Vol_air_L)/(0.0821*data$Water_temp_K)))/data$Vol_water_L
 data$pCO2_uatm  <- data$CO2_umol_L / data$CO2_kh
 

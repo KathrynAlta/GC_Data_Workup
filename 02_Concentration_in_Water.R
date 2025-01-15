@@ -35,7 +35,7 @@
     
     ## I think this is backwards! use ppm in headspace and henry's law to get partial pressure in water in atm -> then use Ideal Gas law in water to go from partial pressure to mol/L
   
-# 01. Ideal Gas Law: Convert from ppm to moles of each gas----
+# 01. Solve for Moles of Each Gas in the Headspace useing Ideal Gas Law----
   
   # Convert barometric pressure from inHg to atm 
   site_data$Baro_atm <- site_data$Baro_inHG * 0.0334
@@ -47,11 +47,10 @@
   gc_data <- left_join(gc_data, site_data_sub)
   
   # Convert partial pressure of each gas from ppm to atm 
-  gc_data$CH4_atm <- (gc_data$CH4_ppm / 1E6) * gc_data$Baro_atm #Divide parts per million by one million and multiply by the atmospheric pressure at the site 
-  gc_data$CO2_atm <- (gc_data$CO2_ppm / 1E6) * gc_data$Baro_atm
-  gc_data$N2O_atm <- (gc_data$N2O_ppm / 1E6) * gc_data$Baro_atm
-    # The first part of this is to go from ppm (which we assume is equal to microatmospheres) to atmospheres and the second part is to the elevation adjusted atmospheric pressure  
-  
+  gc_data$CH4_atm <- gc_data$CH4_ppm * gc_data$Baro_atm #multiply by the atmospheric pressure at the site 
+  gc_data$CO2_atm <- gc_data$CO2_ppm * gc_data$Baro_atm
+  gc_data$N2O_atm <- gc_data$N2O_ppm * gc_data$Baro_atm
+    
   # Convert ambient temp and water temp from C to K 
   gc_data$Ambient_Temp_K <- gc_data$Ambient_Temp_C + 273.15
   gc_data$Water_Temp_C <- as.numeric(gc_data$Water_Temp_C)
@@ -83,7 +82,7 @@
   
 # For air samples you are done here! 
   
-# 02. Henry's Law: From moles in headspace to conc in water ----
+# 02. Solve for moles of gas in the water using Henry's Law ----
 # For water samples you need to use Henry's law to go from the number of moles in the headspace to the concentration in the water 
   # Constants from from Weiss (1974), Wiesenburg and Guinasso (1979), Weiss and Price 1979 
   # Methods and equations come from Ray and Holgerson 2023 and Aho and Raymond 2019 
