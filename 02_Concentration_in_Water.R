@@ -4,8 +4,8 @@
 # 00. Set Up R Environment ----
 
   # Set working directory 
-    # setwd("/Users/altagannon/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice") # Laptop KAG
-    setwd("/Users/kaga3666/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice")    # Desktop SEEC
+    setwd("/Users/altagannon/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice") # Laptop KAG
+    # setwd("/Users/kaga3666/Library/CloudStorage/OneDrive-UCB-O365/Graduate_School/05_Research_Projects/02_GHG_Under_Ice")    # Desktop SEEC
     
   # Load packages and functions 
     source("02_Analysis/GC_Data_Workup/00_libraries.R")
@@ -15,10 +15,6 @@
     samples_clean <- read_excel("01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")
     exetainer_ids <- read_excel("01_Data/Field_Sheets/Exetainer_IDs/20250106_GHG_Under_Ice_Exetainers.xlsx")
     site_data <-  read_excel("01_Data/Field_Sheets/Site_Data/20250106_GHG_Under_Ice_Site_Data.xlsx")
-    
-    solubility_co2 <- read_excel("01_Data/GC/00_Constants/CO2_Solubility_Constants.xlsx")
-    solubility_ch4 <- read_excel("01_Data/GC/00_Constants/CH4_Solubility_Constants.xlsx")
-    solubility_n2o <- read_excel("01_Data/GC/00_Constants/N2O_Solubility_Constants.xlsx")
     
   # Format Data 
     # Fix columne names in exetainer Ids 
@@ -33,8 +29,6 @@
     gc_data <- left_join(samples_clean, exetainer_ids)
     
     
-    ## I think this is backwards! use ppm in headspace and henry's law to get partial pressure in water in atm -> then use Ideal Gas law in water to go from partial pressure to mol/L
-  
 # 01. Solve for Moles of Each Gas in the Headspace useing Ideal Gas Law----
   
   # Convert barometric pressure from inHg to atm 
@@ -50,6 +44,7 @@
   gc_data$CH4_atm <- gc_data$CH4_ppm * gc_data$Baro_atm #multiply by the atmospheric pressure at the site 
   gc_data$CO2_atm <- gc_data$CO2_ppm * gc_data$Baro_atm
   gc_data$N2O_atm <- gc_data$N2O_ppm * gc_data$Baro_atm
+  # **** do you need to divide by a million here? accound to it being parts per million? In previous scripts it was divided by 1E6 and then multiplied by atm pressure 
     
   # Convert ambient temp and water temp from C to K 
   gc_data$Ambient_Temp_K <- gc_data$Ambient_Temp_C + 273.15
@@ -83,35 +78,18 @@
 # For air samples you are done here! 
   
 # 02. Solve for moles of gas in the water using Henry's Law ----
-# For water samples you need to use Henry's law to go from the number of moles in the headspace to the concentration in the water 
   # Constants from from Weiss (1974), Wiesenburg and Guinasso (1979), Weiss and Price 1979 
   # Methods and equations come from Ray and Holgerson 2023 and Aho and Raymond 2019 
   
-  # Add the K0 solubility constants for each gas to the gc data (remember that the solubility constant depends on the temperature!)
+  #2.1) Calculate Solubility coefficients in mol L-1 atm-1 for each 
+  # **** huh equation from PB not working for me here, check in Guildelines for GHG measurement in Reservoirs from PB 
+  #       why is this being exponented? 
+  data$CO2_kh <- exp(-58.0931+90.5069*(100/gc_data$Equilibration_Temp_K) + 22.294*log(gc_data$Equilibration_Temp_K/100))
+  data$CH4_kh <- exp(-68.8862+101.4956*(100/gc_data$Equilibration_Temp_K) + 28.7314*log(gc_data$Equilibration_Temp_K/100))/(0.08206*gc_data$Equilibration_Temp_K/gc_data$Baro_atm)
+  data$N2O_kh <- exp(-62.7062+97.3066*(100/gc_data$Equilibration_Temp_K) + 24.1406*log(gc_data$Equilibration_Temp_K/100))
   
-      # Start by doing some data formatting 
-      gc_data$Water_Temp_C_rounded <- round(gc_data$Water_Temp_C) # Round the water temp to the nearest whole number so that it is compaitble with the solubility numbers 
-      
-      # Format column names for the solubility constant df for each gas 
-      names(solubility_ch4)[names(solubility_ch4) == "Temp_C"] <- "Water_Temp_C_rounded"
-      names(solubility_ch4)[names(solubility_ch4) == "CH4_K0_Salinity0"] <- "CH4_K0"
-      solubility_ch4 <- subset(solubility_ch4, select = c("Water_Temp_C_rounded", "CH4_K0"))
-      head(solubility_ch4)
-      
-      names(solubility_co2)[names(solubility_co2) == "Temp_C"] <- "Water_Temp_C_rounded"
-      names(solubility_co2)[names(solubility_co2) == "CO2_K0_Salinity0"] <- "CO2_K0"
-      solubility_co2 <- subset(solubility_co2, select = c("Water_Temp_C_rounded", "CO2_K0"))
-      head(solubility_co2)
-      
-      names(solubility_n2o)[names(solubility_n2o) == "Temp_C"] <- "Water_Temp_C_rounded"
-      names(solubility_n2o)[names(solubility_n2o) == "N2O_K0_Salinity0"] <- "N2O_K0"
-      solubility_n2o <- subset(solubility_n2o, select = c("Water_Temp_C_rounded", "N2O_K0"))
-      head(solubility_n2o)
-    
-      # join each of the solubility constant dfs to the gc data df by temperature 
-      gc_data <- left_join(gc_data, solubility_ch4, relationship = "many-to-many")
-      gc_data <- left_join(gc_data, solubility_co2, relationship = "many-to-many")
-      gc_data <- left_join(gc_data, solubility_n2o, relationship = "many-to-many")
+  
+
       
   # Calculate concentration of each gas in the water in mols using Henry's law 
       # Is this mols of gas in the water in the equilibration syringe? 
