@@ -45,7 +45,8 @@
   gc_data$CO2_atm <- gc_data$CO2_ppm * gc_data$Baro_atm
   gc_data$N2O_atm <- gc_data$N2O_ppm * gc_data$Baro_atm
   # **** do you need to divide by a million here? accound to it being parts per million? In previous scripts it was divided by 1E6 and then multiplied by atm pressure 
-    
+  # *** this is actually in uatm (microatmospheres)  
+  
   # Convert ambient temp and water temp from C to K 
   gc_data$Ambient_Temp_K <- gc_data$Ambient_Temp_C + 273.15
   gc_data$Water_Temp_C <- as.numeric(gc_data$Water_Temp_C)
