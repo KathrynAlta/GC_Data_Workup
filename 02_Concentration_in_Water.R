@@ -132,11 +132,92 @@
   write_xlsx(gas_conc_data, "01_Data/GC/05_Output_Concentration_Data/20250207_gas_conc_data.xlsx") 
   write_xlsx(gc_data, "01_Data/GC/05_Output_Concentration_Data/20250207_gc_data.xlsx") 
   
+# Playing with Plots ----
+  
+  # Format data to plot 
+  gas_conc_data$Lake_Site <- paste(gas_conc_data$Lake_ID, gas_conc_data$Sample_Type, sep = "_")
+  gas_conc_data$Date_Formatted <- paste(substring(gas_conc_data$Date_Collected, 1, 4), 
+                                        substring(gas_conc_data$Date_Collected, 5, 6), 
+                                        substring(gas_conc_data$Date_Collected, 7, 8), sep= "-") %>% 
+                                  as.POSIXct()
+  
+# Make Preliminary Plot of Raw data 
+  CO2_plot <- ggplot(gas_conc_data, aes(x= Date_Formatted, y= CO2_umol_L, color = Lake_ID, shape = Sample_Type, group = Lake_Site)) +
+    # geom_line() + 
+    geom_point() +
+    theme_bw() + 
+    labs(x = "Date", y = "CO2 Concentration (umol/L)", 
+         title =  "CO2 over time") 
+  CO2_plot   
+  
+  N2O_plot <- ggplot(gas_conc_data, aes(x= Date_Formatted, y= N2O_umol_L, color = Lake_ID, shape = Sample_Type, group = Lake_Site)) +
+    # geom_line() + 
+    geom_point() +
+    theme_bw() + 
+    labs(x = "Date", y = "N2O Concentration (umol/L)", 
+         title =  "N2O over time") 
+  N2O_plot   
       
-      
-      
+  CH4_plot <- ggplot(gas_conc_data, aes(x= Date_Formatted, y= CH4_umol_L, color = Lake_ID, shape = Sample_Type, group = Lake_Site)) +
+    # geom_line() + 
+    geom_point() +
+    theme_bw() + 
+    labs(x = "Date", y = "CH4 Concentration (umol/L)", 
+         title =  "CH4 over time") 
+  CH4_plot   
 
-
+  
+# Average by Lake site 
+  
+# Summarize data: Calculate mean CH4 for each Lake_Site and Date_Formatted
+  avg_gas_conc_data_ch4 <- gas_conc_data %>%
+    group_by(Date_Formatted, Lake_Site) %>%
+    summarise(CH4_mean = mean(CH4_umol_L, na.rm = TRUE), .groups = "drop")
+  
+  avg_gas_conc_data_co2 <- gas_conc_data %>%
+    group_by(Date_Formatted, Lake_Site) %>%
+    summarise(CO2_mean = mean(CO2_umol_L, na.rm = TRUE), .groups = "drop")
+  
+  avg_gas_conc_data_n2o <- gas_conc_data %>%
+    group_by(Date_Formatted, Lake_Site) %>%
+    summarise(N2O_mean = mean(N2O_umol_L, na.rm = TRUE), .groups = "drop")
+  
+  avg_gas_conc_data <- full_join(avg_gas_conc_data_ch4, avg_gas_conc_data_co2)
+  avg_gas_conc_data <- full_join(avg_gas_conc_data, avg_gas_conc_data_n2o)
+  avg_gas_conc_data$Lake <- substring(avg_gas_conc_data$Lake_Site, 1, 3)
+  avg_gas_conc_data$Site <- substring(avg_gas_conc_data$Lake_Site, 5, 6)
+  
+  head(avg_gas_conc_data)
+  
+  # Create the plot
+  
+  # CH4 AVG ___
+  CH4_avg_plot <- ggplot(avg_gas_conc_data, aes(x = Date_Formatted, y = CH4_mean, 
+                                                color = Lake, shape = Site, group = Lake_Site)) +
+    geom_point(size = 2) + 
+    theme_bw() + 
+    labs(x = "Date", y = "Average CH4 Concentration (umol/L)", 
+         title = "Average CH4 over Time")
+  CH4_avg_plot
+  
+  # CO2 AVG ___
+  CO2_avg_plot <- ggplot(avg_gas_conc_data, aes(x = Date_Formatted, y = CO2_mean, 
+                                                color = Lake, shape = Site, group = Lake_Site)) +
+    geom_point(size = 2) + 
+    theme_bw() + 
+    labs(x = "Date", y = "Average CO2 Concentration (umol/L)", 
+         title = "Average CO2 over Time")
+  CO2_avg_plot
+  
+  # N20 Avg ___
+  N2O_avg_plot <- ggplot(avg_gas_conc_data, aes(x = Date_Formatted, y = N2O_mean, 
+                                                color = Lake, shape = Site, group = Lake_Site)) +
+    geom_point(size = 2) + 
+    theme_bw() + 
+    labs(x = "Date", y = "Average N2O Concentration (umol/L)", 
+         title = "Average N2O over Time")
+  N2O_avg_plot
+  
 
 
 
