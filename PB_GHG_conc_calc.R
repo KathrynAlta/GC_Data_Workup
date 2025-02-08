@@ -33,6 +33,7 @@ data$Vol_water_L <- 100/1000
 data$Vol_air_L <- 40/1000
 
 #4) Concentration calculations accounting for air that we added as headspace
+
 #4.1) Solubility coefficients in mol L-1 atm-1
 #CO2: Weiss 1974
 #CH4: Wiesenburg and Guinasso 1979
@@ -49,7 +50,7 @@ data$N2O_sample_uatm <- data$`Calculated N2O final (ppm)`*data$pressure_kesterel
 #4.5) Concentration calculations (for headspace created with atmospheric air)
 # Henry's law to get concentrations in the water 
 # 
-data$CO2_umol_L <- ((data$CO2_sample_uatm* data$Vol_water_L* data$CO2_kh)+((data$CO2_sample_uatm* data$Vol_air_L)/(0.0821*data$Water_temp_K)))/data$Vol_water_L
+data$CO2_umol_L <- ((data$CO2_sample_uatm* data$Vol_water_L* data$CO2_kh) + ((data$CO2_sample_uatm* data$Vol_air_L)/(0.0821*data$Water_temp_K)))/ data$Vol_water_L
 data$pCO2_uatm  <- data$CO2_umol_L / data$CO2_kh
 
 data$CH4_umol_L <- ((data$CH4_sample_uatm* data$Vol_water_L* data$CH4_kh) +((data$CH4_sample_uatm* data$Vol_air_L)/(0.0821*data$Water_temp_K)))/data$Vol_water_L

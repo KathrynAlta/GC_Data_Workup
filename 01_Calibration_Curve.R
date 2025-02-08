@@ -362,7 +362,7 @@
    str(samples_clean)
    
    # Save output (save by run date)
-   write_xlsx(samples_clean, "01_Data/GC/04_Cleaned_Data/20250110_samples_clean.xlsx")     
+   write_xlsx(samples_clean, "01_Data/GC/04_Calibrated_GC_Data/20250110_samples_clean.xlsx")     
    
    
   
