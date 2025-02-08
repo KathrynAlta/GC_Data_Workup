@@ -217,6 +217,7 @@
     labs(x = "Date", y = "Average N2O Concentration (umol/L)", 
          title = "Average N2O over Time")
   N2O_avg_plot
+   
   
 
 
